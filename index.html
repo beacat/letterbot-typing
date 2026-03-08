@@ -15,11 +15,14 @@ body { font-family: 'Andika', Arial, sans-serif; background-color: #f0f4f8; disp
 .chain-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 0; scrollbar-width: thin; scrollbar-color: #2a3044 transparent; }
 .chain-list::-webkit-scrollbar { width: 4px; }
 .chain-list::-webkit-scrollbar-thumb { background: #2a3044; border-radius: 2px; }
-.chain-tile { width: 52px; text-align: center; border-radius: 8px; padding: 7px 0; font-size: 1em; letter-spacing: 0.08em; font-weight: bold; position: relative; flex-shrink: 0; }
+.chain-tile { width: 52px; text-align: center; border-radius: 8px; padding: 7px 0 5px; font-size: 1em; letter-spacing: 0.08em; font-weight: bold; position: relative; flex-shrink: 0; }
 .chain-tile.player { background: #3399ff; color: #fff; }
 .chain-tile.bot { background: #2a3a5a; color: #a0c4ff; }
 .chain-tile .chain-letter { display: inline; }
 .chain-tile .chain-link-letter { color: #ffd166; }
+.chain-tile-emoji { display: block; font-size: 1.15em; line-height: 1.3; margin-top: 2px; letter-spacing: 0; }
+@keyframes emojiPop { 0%,100% { transform: scale(1); } 40% { transform: scale(1.3); } }
+.chain-tile.emoji-found { animation: emojiPop 0.45s ease; }
 .chain-connector { width: 2px; height: 10px; background: #2a3044; margin: 0 auto; flex-shrink: 0; }
 .chat-log { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; word-wrap: break-word; position: relative; }
@@ -64,6 +67,32 @@ const letterbotDictionary = [
 "act","bit","but","cat","cut","dot","eat","fat","fit","get","got","hat","hit","hot","jut","kit","let","lot","mat","met","net","not","opt","pat","pet","pit","pot","put","rat","sat","set","sit","tat","wet"
 ];
 
+// Emoji collectables — player-only words with a visual reward
+const emojiWords = {
+  ale:"🍺", ant:"🐜", ape:"🦍", arc:"🌈", ark:"⛵", art:"🎨",
+  axe:"🪓", bag:"👜", bat:"🦇", bed:"🛏️", bee:"🐝",
+  bin:"🗑️", boa:"🐍", bow:"🏹", box:"📦", bra:"👙",
+  bug:"🐛", bun:"🍞", bus:"🚌", cab:"🚕", can:"🥫",
+  cap:"🧢", car:"🚗", cat:"🐱", cod:"🐟", cow:"🐄",
+  cub:"🐻", cup:"🥤", dad:"👨", die:"🎲", dog:"🐶",
+  ear:"👂", egg:"🥚", elf:"🧝", elk:"🦌", emu:"🦤",
+  ewe:"🐑", eye:"👁️", fan:"🌀", fir:"🎄", fly:"🪰",
+  fog:"🌫️", fox:"🦊", gem:"💎", gnu:"🦬", gym:"🏋️",
+  ham:"🥩", hat:"🎩", hen:"🐔", ice:"❄️", imp:"👺",
+  ink:"🖊️", ivy:"🌿", jam:"🍓", jar:"🍯", jay:"🐦",
+  joy:"😊", jug:"🏺", key:"🔑", law:"⚖️", log:"🪵",
+  lox:"🐟", mad:"😤", map:"🗺️", mom:"👩", mug:"☕",
+  net:"🥅", oak:"🌳", oar:"🚣", oat:"🌾", oil:"🛢️",
+  orb:"🔮", owl:"🦉", pan:"🍳", paw:"🐾",
+  pen:"✏️", pie:"🥧", pig:"🐷", pin:"📍", pot:"🪴",
+  pub:"🍺", pug:"🐶", pup:"🐶", ram:"🐏", rat:"🐀",
+  rib:"🍖", rum:"🥃", rye:"🌾", sad:"😢", saw:"🪚",
+  sea:"🌊", ski:"⛷️", sky:"🌤️", sob:"😭", son:"👦",
+  spa:"💆", sun:"☀️", tea:"🍵", tin:"🥫", toy:"🧸",
+  tub:"🛁", tux:"🤵", urn:"🏺", van:"🚐", vet:"💉",
+  web:"🕸️", wig:"👱", wok:"🍲", yak:"🐃", yam:"🍠", zoo:"🦁"
+};
+
 // Player dictionary (563 three-letter words from CSV)
 const playerDictionary = ["aah","abs","ace","act","add","ado","ads","aft","age","ago","aha","aid","ail","aim","air","alb","ale","all","amp","and","ant","any","ape","app","apt","arc","are","ark","arm","ars","art","ash","ask","asp","ate","awe","awl","awn","axe","aye","baa","bad","bag","bam","ban","bar","bat","bay","bed","bee","beg","ben","bet","bib","bid","big","bin","bit","boa","bob","bog","boo","bop","bow","box","boy","bra","bud","bug","bum","bun","bus","but","buy","bye","cab","cad","cam","can","cap","car","cat","caw","cay","chi","cob","cod","cog","con","coo","cop","cot","cow","coy","cry","cub","cud","cue","cup","cur","cut","dab","dad","dam","day","dee","den","dew","dey","did","die","dig","dim","din","dip","doe","dog","don","dos","dot","dry","dub","dud","due","dug","duo","dye","ear","eat","ebb","eek","eel","eff","egg","ego","eke","elf","elk","ell","elm","emu","end","ens","eon","era","erg","err","eve","ewe","eye","fad","fan","far","fat","fax","fed","fee","fen","few","fib","fig","fin","fir","fit","fix","flu","fly","foe","fog","foh","fop","for","fox","fro","fry","fun","fur","gab","gad","gag","gap","gas","gay","gee","gel","gem","get","gig","gnu","gob","god","goo","got","gum","gut","guy","gym","had","hag","ham","hap","has","hat","haw","hay","hem","hen","her","hes","het","hew","hex","hey","hic","hid","him","hip","his","hit","hoe","hog","hop","hot","how","hub","hue","hug","huh","hum","hut","ice","ick","icy","ide","ids","ifs","ilk","ill","imp","ink","inn","ins","ion","ire","irk","its","ivy","jab","jag","jam","jar","jaw","jay","jet","jib","jig","job","jog","jot","joy","jug","jut","kay","keg","key","kin","kip","kit","lab","lad","lag","lam","lap","law","lax","lay","lea","led","lee","leg","lek","let","lev","lid","lie","lip","lit","lob","log","loo","lop","lot","low","lox","lug","lux","lye","mad","man","map","mar","mat","maw","may","men","met","mew","mid","mix","mob","mom","moo","mop","mow","mud","mug","mum","nab","nag","nap","nay","net","new","nib","nil","nip","nit","nix","nob","nod","nor","not","now","nub","nun","nut","oaf","oak","oar","oat","odd","ode","off","oft","oil","old","one","ooh","opt","orb","ore","ors","our","out","ova","owe","owl","own","ows","pad","pal","pan","pap","par","pat","paw","pay","pea","peg","pen","pep","per","pet","pew","phi","pie","pig","pin","pip","pit","ply","pod","pop","pot","pow","pox","pry","psi","pub","pug","pun","pup","put","qua","rag","ram","ran","rap","rat","raw","ray","red","ref","rev","rho","rib","rid","rig","rim","rip","rob","rod","roe","rot","row","rub","rue","rug","rum","run","rut","rye","sac","sad","sag","sap","sat","saw","sax","say","sea","see","set","sew","she","shy","sic","sim","sin","sip","sir","sit","six","ski","sky","sly","sob","sod","son","sop","sow","soy","spa","spy","sty","sub","sue","sum","sun","tab","tad","tag","tan","tap","tar","tau","tax","tea","tee","ten","the","thy","tic","tie","tin","tip","toe","tom","ton","too","top","tot","tow","toy","try","tub","tug","tux","two","ugh","uke","ups","urn","use","van","vat","vee","vet","vex","via","vie","vim","voe","vow","wad","wag","wan","war","was","wax","way","web","wed","wee","wet","who","why","wig","win","wit","woe","wok","won","woo","wow","wry","wye","wys","yah","yak","yam","yap","yar","yaw","yay","yea","yeh","yen","yep","yes","yet","yew","yip","yod","yon","you","yuk","yum","yup","zag","zap","zed","zee","zen","zho","zig","zip","zit","zoo"];
 
@@ -98,6 +127,29 @@ letterbotDictionary.forEach(word => {
 const validLetters = Object.keys(letterMap);
 let currentLetter = validLetters[Math.floor(Math.random() * validLetters.length)];
 
+// Special reactions to picture words
+const pictureComments = [
+"A picture word! Well spotted!",
+"That's one of the special ones!",
+"Picture perfect!",
+"Ooh, a picture word!",
+"That one has a pic!",
+"Picture word! Nice find!",
+"That one comes with a picture!",
+"You found a special one!"
+];
+let pictureDeck = [];
+function pickPictureComment(){
+  if(pictureDeck.length === 0){
+    pictureDeck = [...pictureComments];
+    for(let i = pictureDeck.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [pictureDeck[i], pictureDeck[j]] = [pictureDeck[j], pictureDeck[i]];
+    }
+  }
+  return pictureDeck.pop();
+}
+
 // Fun, random encouragements
 const funComments = [
 "Wow, good one!","Nice word!","You’re doing great!","Cool choice!","Fantastic!","I like that word!","Keep it up!",
@@ -121,10 +173,11 @@ function addToChain(word, who) {
     chainList.appendChild(connector);
   }
   const tile = document.createElement('div');
-  tile.className = `chain-tile ${who}`;
+  const emoji = (who === 'player') ? emojiWords[word] : null;
+  tile.className = `chain-tile ${who}${emoji ? ' emoji-found' : ''}`;
   const body = word.slice(0, 2);
   const last = word[2];
-  tile.innerHTML = `<span class="chain-letter">${body}</span><span class="chain-link-letter">${last}</span>`;
+  tile.innerHTML = `<span class="chain-letter">${body}</span><span class="chain-link-letter">${last}</span>${emoji ? `<span class="chain-tile-emoji">${emoji}</span>` : ''}`;
   chainList.appendChild(tile);
   chainList.scrollTop = chainList.scrollHeight;
   chainCount.textContent = ++chainLength;
@@ -141,7 +194,7 @@ function addMessage(sender, message){
 
 // ------------------ Letterbot Response ------------------
 function letterbotRespond(lastLetter, skipComment = false){
-  const options = (letterMap[lastLetter.toUpperCase()] || []).filter(w => !usedWords.has(w));
+  const options = (letterMap[lastLetter.toUpperCase()] || []).filter(w => !usedWords.has(w) && !emojiWords[w]);
   if(options.length === 0){
     const exclude = new Set([lastLetter.toUpperCase(), currentLetter]);
     const pool = validLetters.filter(l => !exclude.has(l));
@@ -215,7 +268,12 @@ function sendWord(){
   lastSuggestion = null;
   usedWords.add(word);
   addToChain(word, 'player');
-  setTimeout(()=>letterbotRespond(word[word.length - 1], usedSuggestion), 500);
+  if(emojiWords[word]){
+    setTimeout(()=>addMessage('Letterbot', pickPictureComment()), 300);
+    setTimeout(()=>letterbotRespond(word[word.length - 1], true), 900);
+  } else {
+    setTimeout(()=>letterbotRespond(word[word.length - 1], usedSuggestion), 500);
+  }
 }
 
 sendBtn.addEventListener('click', sendWord);
