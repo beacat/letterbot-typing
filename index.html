@@ -125,6 +125,7 @@ const playerInput = document.getElementById('playerInput');
 const sendBtn = document.getElementById('sendBtn');
 const hint = document.getElementById('hint');
 const usedWords = new Set();
+const botWords = new Set();
 let lastSuggestion = null;
 
 let commentDeck = [];
@@ -241,6 +242,7 @@ function letterbotRespond(lastLetter, skipComment = false){
   hint.innerText = "Letterbot is thinking...";
   const word = options[Math.floor(Math.random() * options.length)];
   usedWords.add(word);
+  botWords.add(word);
 
   setTimeout(()=>{
     if(!skipComment && Math.random() < 0.5){
@@ -282,7 +284,10 @@ function sendWord(){
 
   // Check duplicate
   if(usedWords.has(word)){
-    addMessage('Letterbot', `You already used "${word}". Try a different word.`);
+    const msg = botWords.has(word)
+      ? `I already used "${word}". Try a different word.`
+      : `You already used "${word}". Try a different word.`;
+    addMessage('Letterbot', msg);
     return;
   }
 
