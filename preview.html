@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letterbot Typing Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Andika', Arial, sans-serif; background-color: #f0f4f8; display: flex; justify-content: center; padding: 20px; }
+.container { max-width: 700px; width: 100%; background: #fff; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 80vh; overflow: hidden; }
+.chat-log { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; word-wrap: break-word; position: relative; }
+.bubble.left { background-color: #d0e7ff; color: #003366; align-self: flex-start; border-bottom-left-radius: 0; }
+.bubble.right { background-color: #3399ff; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+.name-label { font-size: 0.8em; color: rgba(0,0,0,0.4); margin-bottom: 2px; }
+.hint { padding: 10px 15px; font-size: 0.9em; color: #555; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; }
+.input-area input { flex: 1; padding: 10px; font-size: 1em; border-radius: 8px; border: 1px solid #ccc; }
+.input-area button { margin-left: 10px; padding: 10px 15px; font-size: 1em; border-radius: 8px; border: none; background-color: #3399ff; color: white; cursor: pointer; }
+.input-area button:hover { background-color: #287acc; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="chat-log" id="chatLog"></div>
+  <div class="hint" id="hint">Letterbot is thinking...</div>
+  <div class="input-area">
+    <input type="text" id="playerInput" placeholder="Type your word here..." />
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script>
+// ------------------ Dictionaries ------------------
+// Letterbot dictionary focused on words with high-option last letters for the player
+const letterbotDictionary = [
+"add","aid","bad","bed","bid","bud","cod","cud","dad","did","end","fad","fed","god","had","hid","kid","led","lid","mad","mud","nod","odd","pad","pod","red","rid","rod","sad","sod","ted","wad","wed",
+"ace","age","ale","ape","are","ate","axe","aye","bye","cue","die","dye","due","eve","eye","fee","fie","foe","gee","hoe","ice","key","lie","ode","one","ore","pie","rue","see","sue","tie","toe","use","vie","woe",
+"air","bar","car","ear","far","fur","her","jar","oar","our","par","per","sir","tar","war",
+"bag","big","bog","bug","dig","dog","egg","fig","fog","gag","hug","jog","lag","leg","log","mug","peg","pig","rag","rug","tag","tug","wag","wig",
+"ban","bean","bin","bun","can","con","den","din","fan","fin","fun","gun","hen","inn","man","pan","pen","pin","run","sun","tan","ten","tin","turn","van","win",
+"top","cap","cup","hop","lap","lip","map","nap","pop","rap","sap","sip","tap","tip","zip",
+"box","fox","mix","pox","six","tax","wax",
+"act","bit","but","cat","cut","dot","eat","fat","fit","get","got","hat","hit","hot","jut","kit","let","lot","mat","met","net","not","opt","pat","pet","pit","pot","put","rat","sat","set","sit","tat","wet"
+];
+
+// Player dictionary (563 three-letter words from CSV)
+const playerDictionary = ["aah","abs","ace","act","add","ado","ads","aft","age","ago","aha","aid","ail","aim","air","alb","ale","all","amp","and","ant","any","ape","app","apt","arc","are","ark","arm","ars","art","ash","ask","asp","ate","awe","awl","awn","axe","aye","baa","bad","bag","bam","ban","bar","bat","bay","bed","bee","beg","ben","bet","bib","bid","big","bin","bit","boa","bob","bog","boo","bop","bow","box","boy","bra","bud","bug","bum","bun","bus","but","buy","bye","cab","cad","cam","can","cap","car","cat","caw","cay","chi","cob","cod","cog","con","coo","cop","cot","cow","coy","cry","cub","cud","cue","cup","cur","cut","dab","dad","dam","day","dee","den","dew","dey","did","die","dig","dim","din","dip","doe","dog","don","dos","dot","dry","dub","dud","due","dug","duo","dye","ear","eat","ebb","eek","eel","eff","egg","ego","eke","elf","elk","ell","elm","emu","end","ens","eon","era","erg","err","eve","ewe","eye","fad","fan","far","fat","fax","fed","fee","fen","few","fib","fig","fin","fir","fit","fix","flu","fly","foe","fog","foh","fop","for","fox","fro","fry","fun","fur","gab","gad","gag","gap","gas","gay","gee","gel","gem","get","gig","gnu","gob","god","goo","got","gum","gut","guy","gym","had","hag","ham","hap","has","hat","haw","hay","hem","hen","her","hes","het","hew","hex","hey","hic","hid","him","hip","his","hit","hoe","hog","hop","hot","how","hub","hue","hug","huh","hum","hut","ice","ick","icy","ide","ids","ifs","ilk","ill","imp","ink","inn","ins","ion","ire","irk","its","ivy","jab","jag","jam","jar","jaw","jay","jet","jib","jig","job","jog","jot","joy","jug","jut","kay","keg","key","kin","kip","kit","lab","lad","lag","lam","lap","law","lax","lay","lea","led","lee","leg","lek","let","lev","lid","lie","lip","lit","lob","log","loo","lop","lot","low","lox","lug","lux","lye","mad","man","map","mar","mat","maw","may","men","met","mew","mid","mix","mob","mom","moo","mop","mow","mud","mug","mum","nab","nag","nap","nay","net","new","nib","nil","nip","nit","nix","nob","nod","nor","not","now","nub","nun","nut","oaf","oak","oar","oat","odd","ode","off","oft","oil","old","one","ooh","opt","orb","ore","ors","our","out","ova","owe","owl","own","ows","pad","pal","pan","pap","par","pat","paw","pay","pea","peg","pen","pep","per","pet","pew","phi","pie","pig","pin","pip","pit","ply","pod","pop","pot","pow","pox","pry","psi","pub","pug","pun","pup","put","qua","rag","ram","ran","rap","rat","raw","ray","red","ref","rev","rho","rib","rid","rig","rim","rip","rob","rod","roe","rot","row","rub","rue","rug","rum","run","rut","rye","sac","sad","sag","sap","sat","saw","sax","say","sea","see","set","sew","she","shy","sic","sim","sin","sip","sir","sit","six","ski","sky","sly","sob","sod","son","sop","sow","soy","spa","spy","sty","sub","sue","sum","sun","tab","tad","tag","tan","tap","tar","tau","tax","tea","tee","ten","the","thy","tic","tie","tin","tip","toe","tom","ton","too","top","tot","tow","toy","try","tub","tug","tux","two","ugh","uke","ups","urn","use","van","vat","vee","vet","vex","via","vie","vim","voe","vow","wad","wag","wan","war","was","wax","way","web","wed","wee","wet","who","why","wig","win","wit","woe","wok","won","woo","wow","wry","wye","wys","yah","yak","yam","yap","yar","yaw","yay","yea","yeh","yen","yep","yes","yet","yew","yip","yod","yon","you","yuk","yum","yup","zag","zap","zed","zee","zen","zho","zig","zip","zit","zoo"];
+
+// ------------------ Game Setup ------------------
+const chatLog = document.getElementById('chatLog');
+const playerInput = document.getElementById('playerInput');
+const sendBtn = document.getElementById('sendBtn');
+const hint = document.getElementById('hint');
+const usedWords = new Set();
+let lastSuggestion = null;
+
+let commentDeck = [];
+function pickComment(){
+  if(commentDeck.length === 0){
+    commentDeck = [...funComments];
+    for(let i = commentDeck.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [commentDeck[i], commentDeck[j]] = [commentDeck[j], commentDeck[i]];
+    }
+  }
+  return commentDeck.pop();
+}
+
+// Create a letter map for fast lookup
+const letterMap = {};
+letterbotDictionary.forEach(word => {
+  const first = word[0].toUpperCase();
+  if(!letterMap[first]) letterMap[first] = [];
+  letterMap[first].push(word);
+});
+
+const validLetters = Object.keys(letterMap);
+let currentLetter = validLetters[Math.floor(Math.random() * validLetters.length)];
+
+// Fun, random encouragements
+const funComments = [
+"Wow, good one!","Nice word!","You’re doing great!","Cool choice!","Fantastic!","I like that word!","Keep it up!",
+"Awesome!","Brilliant!","Super!","Excellent!","That’s clever!","Amazing!","Great thinking!","You rock!",
+"Well done!","Perfect!","Nice job!","Yay!","You got it!", "Hey, that’s a great word!", "Fantastic pick!",
+"You’re on fire!","Love that word!","That’s a winner!","You nailed it!","Great pick!","Gosh I need to step up my game!",
+"How do you think of them all?","You’re a word wizard!","I’m impressed!","That’s a tough one!","You’re unstoppable!",
+"You’ve got the magic touch!","I’m learning from you!","You’re making this fun!","Keep those words coming!",
+"Speedy!","Wow, you’re fast!","That’s quick thinking!","You’re a word machine!","Incredible reflexes!",
+"You’re lightning fast!"
+];
+
+// ------------------ Utility Functions ------------------
+function addMessage(sender, message){
+  const bubble = document.createElement('div');
+  bubble.classList.add('bubble', sender === 'Letterbot' ? 'left' : 'right');
+  bubble.innerHTML = `<div class="name-label">${sender}</div>${message}`;
+  chatLog.appendChild(bubble);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+// ------------------ Letterbot Response ------------------
+function letterbotRespond(lastLetter, skipComment = false){
+  const options = (letterMap[lastLetter.toUpperCase()] || []).filter(w => !usedWords.has(w));
+  if(options.length === 0){
+    const exclude = new Set([lastLetter.toUpperCase(), currentLetter]);
+    const pool = validLetters.filter(l => !exclude.has(l));
+    const newLetter = (pool.length > 0 ? pool : validLetters)[Math.floor(Math.random() * (pool.length > 0 ? pool : validLetters).length)];
+    currentLetter = newLetter;
+    addMessage('Letterbot', `I can't think of a word starting with "${lastLetter.toLowerCase()}". Let's try "${newLetter.toLowerCase()}"!`);
+    hint.innerText = "Your turn! Type a 3-letter word starting with the above letter!";
+    return;
+  }
+
+  // Show thinking
+  hint.innerText = "Letterbot is thinking...";
+  const word = options[Math.floor(Math.random() * options.length)];
+  usedWords.add(word);
+
+  setTimeout(()=>{
+    if(!skipComment && Math.random() < 0.5){
+      const comment = pickComment();
+      addMessage('Letterbot', comment);
+      setTimeout(()=>{
+        addMessage('Letterbot', word);
+        currentLetter = word[word.length - 1].toUpperCase();
+        hint.innerText = "Your turn! Type a 3-letter word starting with the last letter of Letterbot's word.";
+      }, 600);
+    } else {
+      addMessage('Letterbot', word);
+      currentLetter = word[word.length - 1].toUpperCase();
+      hint.innerText = "Your turn! Type a 3-letter word starting with the last letter of Letterbot's word.";
+    }
+  }, 800 + Math.random() * 400);
+}
+
+// ------------------ Player Input ------------------
+function sendWord(){
+  let word = playerInput.value.trim().toLowerCase();
+  if(!word) return;
+  addMessage('You', word);
+  playerInput.value = '';
+
+  // Validate 3 letters
+  if(word.length !== 3){
+    addMessage('Letterbot', `Oops! Please enter exactly 3 letters.`);
+    return;
+  }
+
+  // Validate starting letter
+  if(word[0] !== currentLetter.toLowerCase()){
+    addMessage('Letterbot', `Remember, your word should start with "${currentLetter.toLowerCase()}".`);
+    return;
+  }
+
+  // Check duplicate
+  if(usedWords.has(word)){
+    addMessage('Letterbot', `You already used "${word}". Try a different word.`);
+    return;
+  }
+
+  // Check dictionary
+  if(!playerDictionary.includes(word)){
+    const options = playerDictionary.filter(w => w[0].toLowerCase() === currentLetter.toLowerCase() && !usedWords.has(w));
+    const suggestion = options.length > 0 ? options[Math.floor(Math.random()*options.length)] : "cat";
+    lastSuggestion = suggestion;
+    addMessage('Letterbot', `Hmm, I don't know that word. Try something like "${suggestion}".`);
+    return;
+  }
+
+  // Valid word
+  const usedSuggestion = word === lastSuggestion;
+  lastSuggestion = null;
+  usedWords.add(word);
+  setTimeout(()=>letterbotRespond(word[word.length - 1], usedSuggestion), 500);
+}
+
+sendBtn.addEventListener('click', sendWord);
+playerInput.addEventListener('keydown', e=>{if(e.key==='Enter') sendWord();});
+
+// ------------------ Initial Greeting ------------------
+addMessage('Letterbot', `Hi! I'm Letterbot. Let's start a fun 3-letter word chain. Your first word should start with "${currentLetter.toLowerCase()}".`);
+hint.innerText = `Type a 3-letter word starting with the above letter!`;
+playerInput.focus();
+</script>
+</body>
+</html>
