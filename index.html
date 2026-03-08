@@ -24,6 +24,7 @@ body { font-family: 'Andika', Arial, sans-serif; background-color: #f0f4f8; disp
 @keyframes emojiPop { 0%,100% { transform: scale(1); } 40% { transform: scale(1.3); } }
 .chain-tile.emoji-found { animation: emojiPop 0.45s ease; }
 .chain-connector { width: 2px; height: 10px; background: #2a3044; margin: 0 auto; flex-shrink: 0; }
+.chain-break { width: 52px; text-align: center; font-size: 0.6em; letter-spacing: 0.08em; color: #4a5a7a; padding: 3px 0; flex-shrink: 0; border-top: 1px dashed #2a3044; border-bottom: 1px dashed #2a3044; margin: 2px 0; }
 .chat-log { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; word-wrap: break-word; position: relative; }
 .bubble.left { background-color: #2a3a5a; color: #a0c4ff; align-self: flex-start; border-bottom-left-radius: 0; }
@@ -48,7 +49,7 @@ body { font-family: 'Andika', Arial, sans-serif; background-color: #f0f4f8; disp
   </div>
 </div>
 <div class="chain-panel">
-  <div class="chain-panel-header">Chain<br><span class="chain-count" id="chainCount">0</span></div>
+  <div class="chain-panel-header"><span class="chain-count" id="chainCount">0</span><br>chained words</div>
   <div class="chain-list" id="chainList"></div>
 </div>
 </div>
@@ -205,6 +206,14 @@ function addToChain(word, who) {
   chainCount.textContent = ++chainLength;
 }
 
+function addBreakToChain() {
+  const brk = document.createElement('div');
+  brk.className = 'chain-break';
+  brk.textContent = '✦ new start ✦';
+  chainList.appendChild(brk);
+  chainList.scrollTop = chainList.scrollHeight;
+}
+
 // ------------------ Utility Functions ------------------
 function addMessage(sender, message){
   const bubble = document.createElement('div');
@@ -222,6 +231,7 @@ function letterbotRespond(lastLetter, skipComment = false){
     const pool = validLetters.filter(l => !exclude.has(l));
     const newLetter = (pool.length > 0 ? pool : validLetters)[Math.floor(Math.random() * (pool.length > 0 ? pool : validLetters).length)];
     currentLetter = newLetter;
+    addBreakToChain();
     addMessage('Letterbot', `I can't think of a word starting with "${lastLetter.toLowerCase()}". Let's try "${newLetter.toLowerCase()}"!`);
     hint.innerText = "Your turn! Type a 3-letter word starting with the above letter!";
     return;
