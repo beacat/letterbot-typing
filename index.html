@@ -55,23 +55,45 @@ body { font-family: 'Andika', Arial, sans-serif; background-color: #f0f4f8; disp
 
 <script>
 // ------------------ Dictionaries ------------------
-// Letterbot dictionary focused on words with high-option last letters for the player
+// Letterbot dictionary — words chosen so their last letter gives the player good options
 const letterbotDictionary = [
-"add","aid","bad","bed","bid","bud","cod","cud","dad","did","end","fad","fed","god","had","hid","kid","led","lid","mad","mud","nod","odd","pad","pod","red","rid","rod","sad","sod","ted","wad","wed",
-"ace","age","ale","ape","are","ate","axe","aye","bye","cue","die","dye","due","eve","eye","fee","fie","foe","gee","hoe","ice","key","lie","ode","one","ore","pie","rue","see","sue","tie","toe","use","vie","woe",
-"air","bar","car","ear","far","fur","her","jar","oar","our","par","per","sir","tar","war",
-"bag","big","bog","bug","dig","dog","egg","fig","fog","gag","hug","jog","lag","leg","log","mug","peg","pig","rag","rug","tag","tug","wag","wig",
-"ban","bin","bun","can","con","den","din","fan","fin","fun","hen","inn","man","men","pan","pen","pin","pun","run","son","sun","tan","ten","tin","van","win",
-"top","cap","cup","hop","lap","lip","map","nap","pop","rap","sap","sip","tap","tip","zip",
-"box","fox","mix","pox","six","tax","wax",
-"act","bit","but","cat","cut","dot","eat","fat","fit","get","got","hat","hit","hot","jut","kit","let","lot","mat","met","net","not","opt","pat","pet","pit","pot","put","rat","sat","set","sit","tat","wet"
+// ends in d
+"add","aid","bad","bid","bud","cud","did","end","fad","fed","god","had","hid","kid","led","lid","mud","nod","odd","pad","pod","red","rid","rod","sod","ted","wad","wed",
+// ends in e
+"ace","age","are","ate","aye","bye","cue","dye","due","eve","fee","fie","foe","gee","hoe","lie","ode","one","ore","rue","see","sue","tie","toe","use","vie","woe",
+// ends in r
+"air","bar","car","far","fur","her","our","par","per","sir","tar","war",
+// ends in g
+"big","bog","dig","fig","gag","hug","jog","lag","leg","peg","rag","rug","tag","tug","wag","wig",
+// ends in n
+"ban","con","den","din","fin","fun","inn","man","men","pan","pin","pun","run","tan","ten","win",
+// ends in p
+"hop","lap","lip","nap","pop","rap","sap","sip","tap","tip","top","zip",
+// ends in t
+"act","bit","but","cut","dot","eat","fat","fit","get","got","hit","hot","jut","kit","let","lot","mat","met","not","opt","pat","pet","pit","put","sat","set","sit","tat","wet",
+// ends in b
+"dab","jab","lab","lob","mob","rob","rub","sub",
+// ends in k
+"ask","ilk","irk",
+// ends in l
+"all","eel","ill","nil","pal",
+// ends in m
+"arm","dim","gum","him","hum","sum",
+// ends in o
+"ago","duo","ego","two",
+// ends in s
+"gas","has","his","was",
+// ends in w
+"dew","few","new","now","raw","row","sew",
+// ends in y
+"bay","cry","day","dry","fry","hay","lay","may","pay","ray","say","shy","sly","try","way"
 ];
 
 // Emoji collectables — player-only words with a visual reward
 const emojiWords = {
   ale:"🍺", ant:"🐜", ape:"🦍", arc:"🌈", ark:"⛵", art:"🎨",
   axe:"🪓", bag:"👜", bat:"🦇", bed:"🛏️", bee:"🐝",
-  bin:"🗑️", boa:"🐍", bow:"🏹", box:"📦", bra:"👙",
+  bin:"🗑️", boa:"🐍", bow:"🏹", box:"📦",
   bug:"🐛", bun:"🍞", bus:"🚌", cab:"🚕", can:"🥫",
   cap:"🧢", car:"🚗", cat:"🐱", cod:"🐟", cow:"🐄",
   cub:"🐻", cup:"🥤", dad:"👨", die:"🎲", dog:"🐶",
@@ -194,7 +216,7 @@ function addMessage(sender, message){
 
 // ------------------ Letterbot Response ------------------
 function letterbotRespond(lastLetter, skipComment = false){
-  const options = (letterMap[lastLetter.toUpperCase()] || []).filter(w => !usedWords.has(w) && !emojiWords[w]);
+  const options = (letterMap[lastLetter.toUpperCase()] || []).filter(w => !usedWords.has(w));
   if(options.length === 0){
     const exclude = new Set([lastLetter.toUpperCase(), currentLetter]);
     const pool = validLetters.filter(l => !exclude.has(l));
@@ -257,9 +279,14 @@ function sendWord(){
   // Check dictionary
   if(!playerDictionary.includes(word)){
     const options = playerDictionary.filter(w => w[0].toLowerCase() === currentLetter.toLowerCase() && !usedWords.has(w));
-    const suggestion = options.length > 0 ? options[Math.floor(Math.random()*options.length)] : "cat";
-    lastSuggestion = suggestion;
-    addMessage('Letterbot', `Hmm, I don't know that word. Try something like "${suggestion}".`);
+    if(options.length > 0){
+      const suggestion = options[Math.floor(Math.random()*options.length)];
+      lastSuggestion = suggestion;
+      addMessage('Letterbot', `Hmm, I don't know that word. Try something like "${suggestion}".`);
+    } else {
+      lastSuggestion = null;
+      addMessage('Letterbot', `Hmm, I don't know that word.`);
+    }
     return;
   }
 
